@@ -57,6 +57,14 @@ def render_plate_rotated(block_indices: list[int], plate_no: int, start_word_no:
         marks = " ".join("  ● " if (idx1 & p) != 0 else "  · " for p in POWERS_DESC)
         print(f"{r:>3} |{marks}  ({idx1})")
 
+def _self_check():
+    # Verify that for every possible index 1..2048, the punched weights sum back to the index
+    for i in range(1, 2049):
+        s = sum(p for p in POWERS_DESC if (i & p) != 0)
+        assert s == i, f"Bit-sum mismatch for {i}: got {s}"
+    print("OK: bit columns sum to the 1-based index for all 1..2048.")
+
+
 def main():
     wordlist = load_bip39()
     print(
@@ -95,4 +103,7 @@ def main():
     render_plate_rotated(indices[PLATE_ROWS:], plate_no=2, start_word_no=13)
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "--check":
+        _self_check()
+        sys.exit(0)
     main()
